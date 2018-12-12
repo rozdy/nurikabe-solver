@@ -1,9 +1,12 @@
 package org.rozdy;
 
 import org.rozdy.model.Board;
+import org.rozdy.solver.SeedsSerializer;
 import org.rozdy.solver.Solver;
 
-public class Main {
+import java.util.List;
+
+public class Demo {
 
     public static void main(String[] args) {
         Board board = new Board(12, 8);
@@ -20,7 +23,10 @@ public class Main {
         board.addRequiredIsland(4, 2, 11);
         board.addRequiredIsland(4, 5, 11);
         board.addRequiredIsland(3, 7, 11);
-        Solver.solve(board);
+        Solver solver = new Solver(board);
+        List<List<Long>> correctIterations = solver.precalculate();
+        SeedsSerializer.write(correctIterations, "correct_iterations");
+        board = solver.solve(correctIterations);
         System.out.println(board);
     }
 }

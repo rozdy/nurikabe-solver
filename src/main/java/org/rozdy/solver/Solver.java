@@ -6,50 +6,61 @@ import org.rozdy.model.Island;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class Solver {
 
-    private static int iteration;
+    private Board board;
+    private int iteration;
 
-    private Solver() {}
+    public Solver(Board board) {
+        this.board = board;
+    }
 
-    public static void solve(Board board) {
+    public List<List<Long>> precalculate() {
+        board.init();
+        List<List<Long>> correctIterations = getCorrectIterations();
+        log("Precalculations completed");
+        return correctIterations;
+    }
+
+    public Board solve(List<List<Long>> correctIterations) {
         board.init();
         if (board.isComplete()) {
-            return;
+            return board;
         }
 
-        long[] maxSeeds = board.getIslands().stream().mapToLong(Island::getMaxSeed).toArray();
-        List<List<Long>> correctIterations = getCorrectIterations(board, maxSeeds);
-        System.out.println("[" + new Date() + "] Precalculations completed");
-        int[] iterations = new int[maxSeeds.length];
+        int[] iterations = new int[board.getIslands().size()];
         while (!board.isComplete()) {
             long[] seeds = nextIteration(correctIterations, iterations);
-            boolean generationSuccessful = generateBoard(board, seeds);
+            boolean generationSuccessful = generateBoard(seeds);
             if (generationSuccessful && board.isComplete()) {
-                System.out.println("Done, ez.");
-                System.out.println(board);
-                return;
+                return board;
             }
             board.init();
         }
         throw new RuntimeException("Tried hard but still can't do this :(");
     }
 
-    private static List<List<Long>> getCorrectIterations(Board board, long[] maxSeeds) {
+    private List<List<Long>> getCorrectIterations() {
+        long[] maxSeeds = board.getIslands().stream().mapToLong(Island::getMaxSeed).toArray();
         List<List<Long>> correctIterations = new ArrayList<>(maxSeeds.length);
+        List<Set<String>> correctIslands = new ArrayList<>(maxSeeds.length);
         for (int i = 0; i < maxSeeds.length; i++) {
             correctIterations.add(new ArrayList<>());
+            correctIslands.add(new HashSet<>());
         }
         long max = Arrays.stream(maxSeeds).max().orElse(0);
         for (long i = 0; i < max; i++) {
-            if (i % (max / 100) == 0) {
-                System.out.println("[" + new Date() + "] Precalculations " + i + "/" + max);
+            if (max / 100 != 0 && i % (max / 100) == 0) {
+                log("Precalculations " + i + "/" + max);
             }
             for (int j = 0; j < maxSeeds.length; j++) {
                 board.init();
-                if (maxSeeds[j] > i && board.getIslands().get(j).generateIsland(i)) {
+                Island island = board.getIslands().get(j);
+                if (maxSeeds[j] > i && island.generateIsland(i) && correctIslands.get(j).add(island.toString())) {
                     correctIterations.get(j).add(i);
                 }
             }
@@ -57,17 +68,17 @@ public class Solver {
         return correctIterations;
     }
 
-    private static long[] nextIteration(List<List<Long>> correctIterations, int[] iterations) {
+    private long[] nextIteration(List<List<Long>> correctIterations, int[] iterations) {
         long[] seeds = new long[iterations.length];
         for (int i = 0; i < iterations.length; i++) {
             seeds[i] = correctIterations.get(i).get(iterations[i]);
         }
         if (iteration++ % Integer.MAX_VALUE == 0) {
-            System.out.print("[" + new Date() + "] Still working. Current seeds: ");
+            StringBuilder sb = new StringBuilder("Still working. Current seeds: ");
             for (int i = 0; i < iterations.length; i++) {
-                System.out.print(iterations[i] + "/" + correctIterations.get(i).size() + " ");
+                sb.append(iterations[i]).append("/").append(correctIterations.get(i).size()).append(" ");
             }
-            System.out.println();
+            log(sb.toString());
         }
         for (int i = 0; i < iterations.length; i++) {
             if (iterations[i] < correctIterations.get(i).size() - 1) {
@@ -81,7 +92,7 @@ public class Solver {
         return seeds;
     }
 
-    private static boolean generateBoard(Board board, long[] seeds) {
+    private boolean generateBoard(long[] seeds) {
         for (int j = 0; j < board.getIslands().size(); j++) {
             boolean successful = board.getIslands().get(j).generateIsland(seeds[j]);
             if (!successful) {
@@ -89,5 +100,9 @@ public class Solver {
             }
         }
         return true;
+    }
+
+    private static void log(String message) {
+        System.out.printf("[%s] %s%n", new Date(), message);
     }
 }

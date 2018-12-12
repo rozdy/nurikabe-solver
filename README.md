@@ -10,7 +10,7 @@ gradlew build
 
 cd /build/classes/main
 
-java org.rozdy.Main
+java org.rozdy.Demo
 ```
 
 wait :)

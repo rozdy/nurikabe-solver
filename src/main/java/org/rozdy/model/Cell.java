@@ -18,6 +18,7 @@ public class Cell {
     private Cell lower;
     private Cell right;
     private Island island;
+    private String name;
 
     public boolean checkCellConnections() {
         if (island == null) {
@@ -90,6 +91,9 @@ public class Cell {
 
     @Override
     public String toString() {
+        if (name != null) {
+            return name;
+        }
         int i = 0;
         Cell cell = this;
         while (cell.getUpper() != null) {
@@ -101,6 +105,7 @@ public class Cell {
             j++;
             cell = cell.getLeft();
         }
-        return "Cell " + i + " " + j;
+        name = i + " " + j + " ";
+        return name;
     }
 }
