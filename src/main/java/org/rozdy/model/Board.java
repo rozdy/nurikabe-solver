@@ -51,7 +51,7 @@ public class Board {
         requiredIslands.add(new RequiredIsland(size, i, j));
     }
 
-    public void init() {
+    public void clear() {
         islands.clear();
         Arrays.stream(cells).flatMap(Arrays::stream).forEach(c -> c.setIsland(null));
         requiredIslands.stream().map(i -> new Island(i.size, cells[i.i][i.j])).forEach(i -> islands.add(i));
@@ -68,7 +68,7 @@ public class Board {
         return islands.stream().allMatch(Island::checkIslandConnections);
     }
 
-    private boolean isAllRiversConnected() {
+    public boolean isAllRiversConnected() {
         Cell first = Stream.of(cells).flatMap(Arrays::stream).filter(c -> c.getIsland() == null).findAny().orElse(null);
         if (first == null) {
             return true;

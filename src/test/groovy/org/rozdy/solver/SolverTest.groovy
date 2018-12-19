@@ -78,4 +78,64 @@ class SolverTest extends Specification {
         3     | 3      | 7          | 0       | 0
         3     | 3      | 9          | 0       | 0
     }
+
+    def "Should calculate correct iterations"() {
+        given:
+        def board = new Board(3, 3)
+        board.addRequiredIsland(3, 0, 0)
+        def solver = new Solver(board)
+
+        when:
+        def correctIterations = solver.precalculate()
+
+        then:
+        correctIterations.size() == 1
+        correctIterations.get(0).size() == 5
+    }
+
+    def "Should remove bad seeds while recheck"() {
+        given:
+        def board = new Board(3, 3)
+        board.addRequiredIsland(3, 0, 0)
+        board.addRequiredIsland(1, 2, 1)
+        def solver = new Solver(board)
+        def correctIterations = solver.precalculate()
+        def correctIterationsSize = correctIterations.get(0).size()
+
+        when:
+        def actual = solver.recheckIterations(correctIterations)
+
+        then:
+        actual.get(0).size() != correctIterationsSize
+    }
+
+    def "Should remove bad seeds while recheck 2x2"() {
+        given:
+        def board = new Board(4, 4)
+        board.addRequiredIsland(2, 1, 1)
+        board.addRequiredIsland(2, 2, 2)
+        def solver = new Solver(board)
+        def correctIterations = solver.precalculate()
+
+        when:
+        def actual = solver.recheckIterations(correctIterations)
+
+        then:
+        actual.get(0).size() == 2
+        actual.get(1).size() == 2
+    }
+
+    def "Should remove bad seeds while recheck with rivers not connected"() {
+        given:
+        def board = new Board(3, 2)
+        board.addRequiredIsland(2, 1, 1)
+        def solver = new Solver(board)
+        def correctIterations = solver.precalculate()
+
+        when:
+        def actual = solver.recheckIterations(correctIterations)
+
+        then:
+        actual.get(0).size() == 2
+    }
 }

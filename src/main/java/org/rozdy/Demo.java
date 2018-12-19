@@ -24,9 +24,9 @@ public class Demo {
         board.addRequiredIsland(4, 5, 11);
         board.addRequiredIsland(3, 7, 11);
         Solver solver = new Solver(board);
-        List<List<Long>> correctIterations = solver.precalculate();
-        SeedsSerializer.write(correctIterations, "correct_iterations");
-        board = solver.solve(correctIterations);
-        System.out.println(board);
+        List<List<Long>> correctIterations = SeedsSerializer.read("correct_iterations");
+        correctIterations = solver.recheckIterations(correctIterations);
+        SeedsSerializer.write(correctIterations, "rechecked_iterations");
+        System.out.println("Finished");
     }
 }

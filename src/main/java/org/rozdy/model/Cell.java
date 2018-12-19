@@ -40,7 +40,7 @@ public class Cell {
 
     public boolean isLake() {
         Cell cell = this;
-        for (Function<Cell, Cell> f: CONNECTIONS) {
+        for (Function<Cell, Cell> f : CONNECTIONS) {
             if (cell == null || cell.island != null) {
                 return false;
             }
