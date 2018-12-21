@@ -1,5 +1,7 @@
 package org.rozdy.model;
 
+import static java.util.Collections.emptySet;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -58,7 +60,7 @@ public class Board {
     }
 
     public boolean isComplete() {
-        return isAllIslandsFull() && isAllRiversConnected();
+        return isAllIslandsFull() && isAllRiversCorrect();
     }
 
     private boolean isAllIslandsFull() {
@@ -68,17 +70,28 @@ public class Board {
         return islands.stream().allMatch(Island::checkIslandConnections);
     }
 
-    public boolean isAllRiversConnected() {
+    public boolean isAllRiversCorrect() {
+        Set<Cell> touched = getConnectedRivers();
+        int correctRiversCount = width * height - islands.stream().mapToInt(Island::getSize).sum();
+        return touched.size() == correctRiversCount && touched.stream().noneMatch(Cell::isLake);
+    }
+
+    public boolean isRiversBlocked() {
+        Set<Cell> touched = getConnectedRivers();
+        long allRiversCount = Arrays.stream(cells).flatMap(Arrays::stream).filter(c -> c.getIsland() == null).count();
+        return touched.size() != allRiversCount;
+    }
+
+    private Set<Cell> getConnectedRivers() {
         Cell first = Stream.of(cells).flatMap(Arrays::stream).filter(c -> c.getIsland() == null).findAny().orElse(null);
         if (first == null) {
-            return true;
+            return emptySet();
         }
         Set<Cell> touched = ConcurrentHashMap.newKeySet();
         touched.add(first);
         while (touched.stream().anyMatch(c -> touched.addAll(c.getConnectedRivers()))) {
         }
-        int correctRiversCount = width * height - islands.stream().mapToInt(Island::getSize).sum();
-        return touched.size() == correctRiversCount && touched.stream().noneMatch(Cell::isLake);
+        return touched;
     }
 
     public List<Island> getIslands() {

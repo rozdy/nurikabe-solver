@@ -34,7 +34,7 @@ public class Solver {
         long max = Arrays.stream(maxSeeds).max().orElse(0);
         for (long i = 0; i < max; i++) {
             if (max / 100 != 0 && i % (max / 100) == 0) {
-                LOG.info(format("Precalculations in progress %d/%d %d %c", i, max, max / 100, '%'));
+                LOG.info(format("Precalculations in progress %d/%d %d %c", i, max, i % (max / 100), '%'));
             }
             for (int j = 0; j < maxSeeds.length; j++) {
                 board.clear();
@@ -54,7 +54,7 @@ public class Solver {
                 board.clear();
                 Island island = board.getIslands().get(i);
                 island.generateIsland(seed);
-                if (!island.checkIslandConnections() || !board.isAllRiversConnected()) {
+                if (!island.checkIslandConnections() || board.isRiversBlocked()) {
                     incorrectIterations.add(seed);
                 }
             }
@@ -71,11 +71,22 @@ public class Solver {
         }
 
         IterationBuilder iterationBuilder = new IterationBuilder(correctIterations);
+        return solve(iterationBuilder);
+    }
+
+    public Board solve(List<List<Long>> correctIterations, int[] iteration) {
+        IterationBuilder iterationBuilder = new IterationBuilder(correctIterations, iteration);
+        return solve(iterationBuilder);
+    }
+
+    private Board solve(IterationBuilder iterationBuilder) {
         int generationState = 0;
         while (!board.isComplete()) {
             long[] seeds = iterationBuilder.nextIteration(generationState);
             generationState = generateBoard(seeds);
             if (generationState == 0 && board.isComplete()) {
+                LOG.info("Solved");
+                iterationBuilder.logIteration();
                 return board;
             }
             board.clear();
@@ -84,10 +95,12 @@ public class Solver {
     }
 
     private int generateBoard(long[] seeds) {
-        for (int j = 0; j < board.getIslands().size(); j++) {
-            boolean successful = board.getIslands().get(j).generateIsland(seeds[j]);
+        for (int i = 0; i < board.getIslands().size(); i++) {
+            Island island = board.getIslands().get(i);
+            boolean successful = island.generateIsland(seeds[i]) && island.checkIslandConnections()
+                    && !board.isRiversBlocked();
             if (!successful) {
-                return j + 1;
+                return i + 1;
             }
         }
         return 0;

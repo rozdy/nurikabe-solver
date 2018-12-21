@@ -17,6 +17,11 @@ public class IterationBuilder {
         iteration = new int[correctIterations.size()];
     }
 
+    public IterationBuilder(List<List<Long>> correctIterations, int[] iteration) {
+        this.correctIterations = correctIterations;
+        this.iteration = iteration;
+    }
+
     public long[] nextIteration(int generationState) {
         logIteration();
         if (seeds == null) {
@@ -46,9 +51,9 @@ public class IterationBuilder {
         }
     }
 
-    private void logIteration() {
+    public void logIteration() {
         if (perfomanceHandler++ == 0) {
-            StringBuilder sb = new StringBuilder("Still working. Current seeds: ");
+            StringBuilder sb = new StringBuilder("Current seeds: ");
             for (int i = 0; i < iteration.length; i++) {
                 sb.append(iteration[i]).append("/").append(correctIterations.get(i).size()).append(" ");
             }

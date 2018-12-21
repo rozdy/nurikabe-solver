@@ -22,7 +22,7 @@ public class SeedsSerializer {
             wr.write(System.lineSeparator());
             wr.write("Seeds counts: ");
             for (List<Long> iterations : correctIterations) {
-                wr.write(Integer.toString(correctIterations.size()));
+                wr.write(Integer.toString(iterations.size()));
                 wr.write(" ");
             }
             wr.write(System.lineSeparator());
