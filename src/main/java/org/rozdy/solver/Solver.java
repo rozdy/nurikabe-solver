@@ -22,7 +22,7 @@ public class Solver {
         this.board = board;
     }
 
-    public List<List<Long>> precalculate() {
+    public List<List<Long>> findCorrectIterations() {
         board.clear();
         long[] maxSeeds = board.getIslands().stream().mapToLong(Island::getMaxSeed).toArray();
         List<List<Long>> correctIterations = new ArrayList<>(maxSeeds.length);
@@ -34,7 +34,7 @@ public class Solver {
         long max = Arrays.stream(maxSeeds).max().orElse(0);
         for (long i = 0; i < max; i++) {
             if (max / 100 != 0 && i % (max / 100) == 0) {
-                LOG.info(format("Precalculations in progress %d/%d %d %c", i, max, i % (max / 100), '%'));
+                LOG.info(format("Precalculations in progress %d/%d %d %c", i, max, i / (max / 100), '%'));
             }
             for (int j = 0; j < maxSeeds.length; j++) {
                 board.clear();
@@ -47,7 +47,7 @@ public class Solver {
         return correctIterations;
     }
 
-    public List<List<Long>> recheckIterations(List<List<Long>> correctIterations) {
+    public List<List<Long>> recheckCorrectIterations(List<List<Long>> correctIterations) {
         for (int i = 0; i < correctIterations.size(); i++) {
             List<Long> incorrectIterations = new ArrayList<>();
             for (Long seed: correctIterations.get(i)) {

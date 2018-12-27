@@ -6,7 +6,7 @@ class BoardTest extends Specification {
 
     def "Should be complete board 1x1"() {
         given:
-        def board = BoardBuilder.board().withHeight(1).withWidth(1).build()
+        def board = new Board(1, 1)
 
         when:
         def complete = board.isComplete()
@@ -17,8 +17,9 @@ class BoardTest extends Specification {
 
     def "Should be complete board 2x2 with one island"() {
         given:
-        def board = BoardBuilder.board().withHeight(2).withWidth(2).build()
-        board.addIsland(size, i, j);
+        def board = new Board(2, 2)
+        board.addRequiredIsland(size, i, j)
+        board.clear()
 
         when:
         def complete = board.isComplete()
@@ -36,8 +37,9 @@ class BoardTest extends Specification {
 
     def "Should be not complete board 2x2 with one not complete island"() {
         given:
-        def board = BoardBuilder.board().withHeight(2).withWidth(2).build()
-        board.addIsland(size, i, j);
+        def board = new Board(2, 2)
+        board.addRequiredIsland(size, i, j)
+        board.clear()
 
         when:
         def complete = board.isComplete()
@@ -56,8 +58,10 @@ class BoardTest extends Specification {
 
     def "Should be complete board 2x2 with one complete island"() {
         given:
-        def board = BoardBuilder.board().withHeight(2).withWidth(2).withIsland(size, i, j).build()
-        def island = board.getIslands().first();
+        def board = new Board(2, 2)
+        board.addRequiredIsland(size, i, j)
+        board.clear()
+        def island = board.getIslands().first()
         island.addCell(board.cells[i1][j1])
 
         when:
@@ -76,8 +80,10 @@ class BoardTest extends Specification {
 
     def "Should be complete board 4x2 with one complete island"() {
         given:
-        def board = BoardBuilder.board().withHeight(4).withWidth(2).build()
-        def island = board.addIsland(size, i, j);
+        def board = new Board(4, 2)
+        board.addRequiredIsland(size, i, j)
+        board.clear()
+        def island = board.getIslands().first()
         island.addCell(board.cells[i1][j1])
 
         when:
@@ -85,7 +91,6 @@ class BoardTest extends Specification {
 
         then:
         complete
-
 
         where:
         i | j | size | i1 | j1
@@ -95,17 +100,17 @@ class BoardTest extends Specification {
 
     def "Should be not complete board 4x2 with one complete island"() {
         given:
-        def board = BoardBuilder.board().withHeight(4).withWidth(2).build()
-        def island = board.addIsland(size, i, j);
+        def board = new Board(4, 2)
+        board.addRequiredIsland(size, i, j)
+        board.clear()
+        def island = board.getIslands().first()
         island.addCell(board.cells[i1][j1])
-        System.out.println(board)
 
         when:
         def complete = board.isComplete()
 
         then:
         !complete
-
 
         where:
         i | j | size | i1 | j1
@@ -117,16 +122,14 @@ class BoardTest extends Specification {
 
     def "Should be not complete board 3x3 with one island"() {
         given:
-        def board = BoardBuilder.board().withHeight(3).withWidth(3).build()
-        board.addIsland(size, i, j);
-        System.out.println(board)
+        def board = new Board(3, 3)
+        board.addRequiredIsland(size, i, j)
 
         when:
         def complete = board.isComplete()
 
         then:
         !complete
-
 
         where:
         i | j | size

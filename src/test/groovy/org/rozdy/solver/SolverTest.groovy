@@ -1,6 +1,7 @@
 package org.rozdy.solver
 
 import org.rozdy.model.Board
+import spock.lang.Ignore
 import spock.lang.Specification
 
 class SolverTest extends Specification {
@@ -12,7 +13,7 @@ class SolverTest extends Specification {
         def solver = new Solver(board)
 
         when:
-        solver.solve(solver.precalculate())
+        solver.solve(solver.findCorrectIterations())
 
         then:
         board.isComplete()
@@ -25,13 +26,13 @@ class SolverTest extends Specification {
 
     def "Should solve different boards with two islands"() {
         given:
-        def board = new Board(width, heigth)
+        def board = new Board(heigth, width)
         board.addRequiredIsland(islandSize, islandI, islandJ)
         board.addRequiredIsland(island2Size, island2I, island2J)
         def solver = new Solver(board)
 
         when:
-        solver.solve(solver.precalculate())
+        solver.solve(solver.findCorrectIterations())
 
         then:
         board.isComplete()
@@ -54,29 +55,27 @@ class SolverTest extends Specification {
         def solver = new Solver(board)
 
         when:
-        solver.solve(solver.precalculate())
+        solver.solve(solver.findCorrectIterations())
 
         then:
         board.isComplete()
     }
 
+    @Ignore("It's very slow")
     def "Should solve board with one long island"() {
         given:
-        def board = new Board(width, heigth)
-        board.addRequiredIsland(islandSize, islandI, islandJ)
+        def board = new Board(3, 3)
+        board.addRequiredIsland(islandSize, 0, 0)
         def solver = new Solver(board)
 
         when:
-        solver.solve(solver.precalculate())
+        solver.solve(solver.findCorrectIterations())
 
         then:
         board.isComplete()
 
         where:
-        width | heigth | islandSize | islandI | islandJ
-        3     | 3      | 5          | 0       | 0
-        3     | 3      | 7          | 0       | 0
-        3     | 3      | 9          | 0       | 0
+        islandSize << [5, 7, 9]
     }
 
     def "Should calculate correct iterations"() {
@@ -86,7 +85,7 @@ class SolverTest extends Specification {
         def solver = new Solver(board)
 
         when:
-        def correctIterations = solver.precalculate()
+        def correctIterations = solver.findCorrectIterations()
 
         then:
         correctIterations.size() == 1
@@ -99,11 +98,11 @@ class SolverTest extends Specification {
         board.addRequiredIsland(3, 0, 0)
         board.addRequiredIsland(1, 2, 1)
         def solver = new Solver(board)
-        def correctIterations = solver.precalculate()
+        def correctIterations = solver.findCorrectIterations()
         def correctIterationsSize = correctIterations.get(0).size()
 
         when:
-        def actual = solver.recheckIterations(correctIterations)
+        def actual = solver.recheckCorrectIterations(correctIterations)
 
         then:
         actual.get(0).size() != correctIterationsSize
@@ -115,10 +114,10 @@ class SolverTest extends Specification {
         board.addRequiredIsland(2, 1, 1)
         board.addRequiredIsland(2, 2, 2)
         def solver = new Solver(board)
-        def correctIterations = solver.precalculate()
+        def correctIterations = solver.findCorrectIterations()
 
         when:
-        def actual = solver.recheckIterations(correctIterations)
+        def actual = solver.recheckCorrectIterations(correctIterations)
 
         then:
         actual.get(0).size() == 2
@@ -130,10 +129,10 @@ class SolverTest extends Specification {
         def board = new Board(3, 2)
         board.addRequiredIsland(2, 1, 1)
         def solver = new Solver(board)
-        def correctIterations = solver.precalculate()
+        def correctIterations = solver.findCorrectIterations()
 
         when:
-        def actual = solver.recheckIterations(correctIterations)
+        def actual = solver.recheckCorrectIterations(correctIterations)
 
         then:
         actual.get(0).size() == 2

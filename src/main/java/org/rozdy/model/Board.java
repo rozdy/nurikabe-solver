@@ -17,7 +17,7 @@ public class Board {
     private List<RequiredIsland> requiredIslands = new ArrayList<>();
     private Cell[][] cells;
 
-    public Board(int width, int height) {
+    public Board(int height, int width) {
         this.width = width;
         this.height = height;
         islands = new ArrayList<>();

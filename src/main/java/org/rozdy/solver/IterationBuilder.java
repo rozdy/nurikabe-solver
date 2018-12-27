@@ -10,7 +10,7 @@ public class IterationBuilder {
     private List<List<Long>> correctIterations;
     private int[] iteration;
     private long[] seeds;
-    private int perfomanceHandler;
+    private int performanceHandler;
 
     public IterationBuilder(List<List<Long>> correctIterations) {
         this.correctIterations = correctIterations;
@@ -52,12 +52,16 @@ public class IterationBuilder {
     }
 
     public void logIteration() {
-        if (perfomanceHandler++ == 0) {
+        if (performanceHandler++ == 0) {
             StringBuilder sb = new StringBuilder("Current seeds: ");
             for (int i = 0; i < iteration.length; i++) {
                 sb.append(iteration[i]).append("/").append(correctIterations.get(i).size()).append(" ");
             }
             LOG.info(sb.toString());
         }
+    }
+
+    public int getSize() {
+        return correctIterations.size();
     }
 }
